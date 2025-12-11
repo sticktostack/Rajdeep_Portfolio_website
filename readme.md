@@ -1,11 +1,11 @@
 # 🚀 Rajdeep DebRoy - Portfolio
 
-![Portfolio Screenshot](https://i.imgur.com/placeholder.png) <!-- Add your screenshot later -->
+![Portfolio Screenshot](portfolio_ss.png) <!-- Add your screenshot later -->
 
 A modern, animated web developer portfolio built with vanilla JavaScript and GSAP animations. Features smooth scrolling, interactive elements, and responsive design.
 
 ## ✨ Live Demo
-[**🌐 View Live Portfolio**](https://rajdeep-portfolioo.netlify.app/)
+[**🌐 View Live Portfolio**](https://rajdeepdroy-portfolio.netlify.app//)
 
 ## 📁 Project Structure
 ```
