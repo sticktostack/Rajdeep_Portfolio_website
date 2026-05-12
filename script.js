@@ -174,41 +174,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 5. SKILL BARS ANIMATION
   function initSkillBars() {
-    const skillBars = document.querySelectorAll(".skill-bar");
-    skillBars.forEach((bar) => {
-      const progress = bar.querySelector(".skill-progress");
-      const width = progress.getAttribute("data-width");
-      ScrollTrigger.create({
-        trigger: bar,
-        start: "top 95%",
-        once: true, // KEY FIX: animate once, never reset
-        onEnter: () => {
-          gsap.to(progress, {
-            width: `${width}%`,
-            duration: 1.5,
-            ease: "power2.out",
-          });
-        },
-      });
+    const isPhone = window.matchMedia('(max-width: 767px)').matches;
+
+     const skillBars = document.querySelectorAll('.skill-bar');
+    skillBars.forEach(bar => {
+        const progress = bar.querySelector('.skill-progress');
+        const width = progress.getAttribute('data-width');
+
+        if (isPhone) {
+            // Fill bars immediately on phones without scroll trigger
+            gsap.to(progress, { width: `${width}%`, duration: 1.5, ease: "power2.out", delay: 0.3 });
+        } else {
+            // Tablets and laptops use scroll trigger
+            ScrollTrigger.create({
+                trigger: bar,
+                start: "top 95%",
+                once: true,
+                onEnter: () => {
+                    gsap.to(progress, { width: `${width}%`, duration: 1.5, ease: "power2.out" });
+                }
+            });
+        }
     });
 
-    gsap.fromTo(
-      ".tech-icon",
-      { y: 30, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        duration: 0.6,
-        stagger: 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".tech-icons",
-          start: "top 95%",
-          once: true,
-        },
-      },
-    );
-  }
+    // Tech icons
+    const isPhone2 = window.matchMedia('(max-width: 767px)').matches;
+    if (isPhone2) {
+        gsap.set('.tech-icon', { opacity: 1, y: 0 });
+    } else {
+        gsap.fromTo('.tech-icon',
+            { y: 30, opacity: 0 },
+            {
+                y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out",
+                scrollTrigger: {
+                    trigger: '.tech-icons',
+                    start: "top 95%",
+                    once: true
+                }
+            }
+        );
+    }
+}
 
   // 6. PROJECT TABS
   function initProjectTabs() {
