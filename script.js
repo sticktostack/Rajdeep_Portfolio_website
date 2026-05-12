@@ -1,286 +1,176 @@
-document.addEventListener('DOMContentLoaded', function() {
-    
+document.addEventListener('DOMContentLoaded', function () {
+
     // 1. INITIALIZE GSAP & SCROLLTRIGGER
-    gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.defaults({
-    markers: false
-});
-    
-    // Set default animation preferences
+    gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
     gsap.defaults({
         ease: "power2.out",
         duration: 0.8
     });
-    
+
+    // ─── KEY FIX ─────────────────────────────────────────────────────────────
+    // Set all animatable elements visible by default via CSS so that if a
+    // ScrollTrigger never fires (e.g. user jumps via nav link), nothing stays
+    // hidden. GSAP "from" will override this during the animation; after it
+    // completes the element is back to its natural visible state.
+    // ─────────────────────────────────────────────────────────────────────────
+
     // 2. HERO SECTION ANIMATIONS
     function initHeroAnimations() {
-        const heroLines = document.querySelectorAll('.hero-line');
         const resumeButton = document.querySelector('#resume');
         const profileImage = document.querySelector('.profile-image');
         const introElements = document.querySelectorAll('.intro-text, .role-title, .role-description');
-        
-        // Animate "Hello" box
+
         gsap.from('.hellobox', {
-            y: -50,
-            opacity: 0,
-            duration: 0.8,
-            delay: 0.2,
-            ease: "back.out(1.7)"
+            y: -50, opacity: 0, duration: 0.8, delay: 0.2, ease: "back.out(1.7)"
         });
-        
-        // Split hero text into characters for animation
+
+        const heroLines = document.querySelectorAll('.hero-line');
         heroLines.forEach((line, index) => {
             const chars = line.querySelectorAll('.letters');
-            
-            // Animate characters with delay
             gsap.from(chars, {
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.05,
-                delay: 0.3 + (index * 0.5),
+                y: 50, opacity: 0, duration: 0.8,
+                stagger: 0.05, delay: 0.3 + (index * 0.5),
                 ease: "back.out(1.7)"
             });
-            
-            // Animate red letter separately
             const redLetter = line.querySelector('.red-letter');
             if (redLetter) {
                 gsap.from(redLetter, {
-                    scale: 0,
-                    opacity: 0,
-                    duration: 0.6,
-                    delay: 0.9,
-                    ease: "elastic.out(1, 0.5)"
+                    scale: 0, opacity: 0, duration: 0.6,
+                    delay: 0.9, ease: "elastic.out(1, 0.5)"
                 });
             }
         });
-        
-        // Animate resume button after text
+
         gsap.from(resumeButton, {
-            y: 30,
-            opacity: 0,
-            duration: 0.8,
-            delay: 2.0,
-            ease: "back.out(1.7)"
+            y: 30, opacity: 0, duration: 0.8, delay: 1.6, ease: "back.out(1.7)"
         });
-        
-        // Animate profile image
-        gsap.from(profileImage, {
-            scale: 0.8,
-            opacity: 0,
-            rotation: -5,
-            duration: 1,
-            delay: 1.2,
-            ease: "power2.out"
-        });
-        
-        // Animate intro text elements with slight delay
+
+        if (profileImage) {
+            gsap.from(profileImage, {
+                scale: 0.8, opacity: 0, rotation: -5,
+                duration: 1, delay: 1.2, ease: "power2.out"
+            });
+            gsap.to(profileImage, {
+                y: -10, duration: 2, repeat: -1,
+                yoyo: true, ease: "sine.inOut", delay: 2.5
+            });
+        }
+
         introElements.forEach((el, index) => {
             gsap.from(el, {
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                delay: 1.5 + (index * 0.2),
-                ease: "power2.out"
+                y: 30, opacity: 0, duration: 0.8,
+                delay: 1.5 + (index * 0.2), ease: "power2.out"
             });
         });
-        
-        // Add floating animation to profile image
-        gsap.to(profileImage, {
-            y: -10,
-            duration: 2,
-            repeat: -1,
-            yoyo: true,
-            ease: "sine.inOut",
-            delay: 3
-        });
     }
-    
+
     // 3. NAVIGATION ANIMATIONS
     function initNavAnimations() {
         const navbar = document.querySelector('#navbar');
         const navItems = document.querySelectorAll('#navbar > a');
-        
-        // Animate navbar on load
-        gsap.from(navbar, {
-            y: -100,
-            opacity: 0,
-            duration: 0.8,
-            delay: 0.1,
-            ease: "power2.out"
-        });
-        
-        // Animate nav items with stagger
-        gsap.from(navItems, {
-            y: -20,
-            opacity: 0,
-            duration: 0.5,
-            stagger: 0.1,
-            delay: 0.3,
-            ease: "back.out(1.7)"
-        });
-        
-        // Animate logo
         const logo = document.querySelector('#navbar > h3');
-        gsap.from(logo, {
-            scale: 0,
-            rotation: 360,
-            duration: 0.8,
-            delay: 0.5,
-            ease: "back.out(1.7)"
-        });
+
+        gsap.from(navbar, { y: -100, opacity: 0, duration: 0.8, delay: 0.1 });
+        gsap.from(navItems, { y: -20, opacity: 0, duration: 0.5, stagger: 0.1, delay: 0.3, ease: "back.out(1.7)" });
+        if (logo) gsap.from(logo, { scale: 0, rotation: 360, duration: 0.8, delay: 0.5, ease: "back.out(1.7)" });
     }
-    
+
     // 4. SECTION REVEAL ANIMATIONS
-    function initSectionReveals() {
-        // Services section
-        const services = document.querySelector('#service');
-        const serviceCards = document.querySelectorAll('.servicecard');
-        
-        gsap.from(services, {
-            scrollTrigger: {
-                trigger: services,
-                start: "top 80%",
-                toggleActions: "play none none reverse"
-            },
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            ease: "power2.out"
-        });
-        
-        // Animate service cards with stagger
-        serviceCards.forEach((card, index) => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top 85%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 30,
-                opacity: 0,
-                duration: 0.8,
-                delay: index * 0.1,
-                ease: "power2.out"
-            });
-        });
-        
-        // Skills section
-        const skillsSection = document.querySelector('#skills');
-        
-        gsap.from(skillsSection, {
-            scrollTrigger: {
-                trigger: skillsSection,
-                start: "top 80%",
-                toggleActions: "play none none reverse"
-            },
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            ease: "power2.out"
-        });
-        
-        // Projects section
-        const projectsSection = document.querySelector('#projects');
-        
-        gsap.from(projectsSection, {
-            scrollTrigger: {
-                trigger: projectsSection,
-                start: "top 80%",
-                toggleActions: "play none none reverse"
-            },
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            ease: "power2.out"
-        });
-        
-        // Footer section
-        const footerSection = document.querySelector('#contact-footer');
-        
-        gsap.from(footerSection, {
-            scrollTrigger: {
-                trigger: footerSection,
-                start: "top 90%",
-                toggleActions: "play none none reverse"
-            },
-            y: 50,
-            opacity: 0,
-            duration: 1,
-            ease: "power2.out"
+    // ─── KEY FIX ─────────────────────────────────────────────────────────────
+    // Use `once: true` so animations play once and never reverse.
+    // Use `start: "top 95%"` so triggers fire earlier (before element is fully
+    // in view), preventing the "late appearance" on mobile.
+    // Remove `toggleActions` entirely — replaced by `once: true`.
+    // ─────────────────────────────────────────────────────────────────────────
+    function revealOnScroll(selector, extraVars = {}) {
+        const els = document.querySelectorAll(selector);
+        els.forEach((el, i) => {
+            gsap.fromTo(el,
+                { y: 40, opacity: 0 },
+                {
+                    y: 0, opacity: 1, duration: 0.9,
+                    delay: extraVars.staggerDelay ? i * extraVars.staggerDelay : 0,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 95%",   // fires earlier → no late-pop on mobile
+                        once: true           // never reverses → no disappear on scroll-up
+                    }
+                }
+            );
         });
     }
-    
+
+    function initSectionReveals() {
+        revealOnScroll('#service');
+        revealOnScroll('.servicecard', { staggerDelay: 0.08 });
+        revealOnScroll('#skills');
+        revealOnScroll('#projects');
+        revealOnScroll('#contact-footer');
+        revealOnScroll('.projects-header');
+        revealOnScroll('.skills-header');
+    }
+
     // 5. SKILL BARS ANIMATION
     function initSkillBars() {
         const skillBars = document.querySelectorAll('.skill-bar');
-        
         skillBars.forEach(bar => {
             const progress = bar.querySelector('.skill-progress');
             const width = progress.getAttribute('data-width');
-            
             ScrollTrigger.create({
                 trigger: bar,
-                start: "top 90%",
+                start: "top 95%",
+                once: true,   // KEY FIX: animate once, never reset
                 onEnter: () => {
                     gsap.to(progress, {
-                        width: `${width}%`,
-                        duration: 1.5,
-                        ease: "power2.out"
+                        width: `${width}%`, duration: 1.5, ease: "power2.out"
                     });
                 }
             });
         });
-        
-        // Animate tech icons
-        const techIcons = document.querySelectorAll('.tech-icon');
-        gsap.from(techIcons, {
-            scrollTrigger: {
-                trigger: '.tech-icons',
-                start: "top 85%",
-                toggleActions: "play none none reverse"
-            },
-            y: 30,
-            opacity: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            ease: "power2.out"
-        });
+
+        gsap.fromTo('.tech-icon',
+            { y: 30, opacity: 0 },
+            {
+                y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: "power2.out",
+                scrollTrigger: {
+                    trigger: '.tech-icons',
+                    start: "top 95%",
+                    once: true
+                }
+            }
+        );
     }
-    
-    // 6. PROJECT TABS ANIMATION
+
+    // 6. PROJECT TABS
     function initProjectTabs() {
         const tabBtns = document.querySelectorAll('.tab-btn');
         const projectTabs = document.querySelectorAll('.project-tab');
-        
+
         tabBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
+            btn.addEventListener('click', function () {
                 const tabId = this.getAttribute('data-tab');
-                
-                // Remove active class from all tabs and buttons
+
                 tabBtns.forEach(b => {
                     b.classList.remove('active');
                     gsap.to(b, { scale: 1, duration: 0.3 });
                 });
                 projectTabs.forEach(tab => {
                     tab.classList.remove('active');
-                    gsap.to(tab, { opacity: 0, y: 20, duration: 0.3 });
+                    gsap.set(tab, { opacity: 0, y: 20 });
                 });
-                
-                // Add active class to clicked button
+
                 this.classList.add('active');
                 gsap.to(this, { scale: 1.05, duration: 0.3 });
-                
-                // Animate the new active tab
+
                 const activeTab = document.getElementById(tabId);
                 activeTab.classList.add('active');
-                
                 gsap.fromTo(activeTab,
                     { opacity: 0, y: 20 },
                     { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }
                 );
-                
-                // Animate project image
+
                 const projectImage = activeTab.querySelector('.image-container img');
                 if (projectImage) {
                     gsap.fromTo(projectImage,
@@ -290,172 +180,86 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-        
-        // Hover effect for project images
-        const projectImages = document.querySelectorAll('.image-container img');
-        projectImages.forEach(img => {
-            img.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    scale: 1.05,
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
-            });
-            
-            img.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    scale: 1.02,
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
-            });
+
+        // Hover on project images
+        document.querySelectorAll('.image-container img').forEach(img => {
+            img.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.05, duration: 0.3 }));
+            img.addEventListener('mouseleave', () => gsap.to(img, { scale: 1.02, duration: 0.3 }));
         });
     }
-    
-    // 7. FOOTER & CONTACT ANIMATIONS
+
+    // 7. FOOTER & CONTACT
     function initFooterAnimations() {
-        // Set current year in copyright
         document.getElementById('current-year').textContent = new Date().getFullYear();
-        
-        // Back to top button
-        const backToTopBtn = document.getElementById('backToTop');
-        
-        if (backToTopBtn) {
-            function toggleBackToTop() {
-                if (window.scrollY > 300) {
-                    gsap.to(backToTopBtn, {
-                        opacity: 1,
-                        visibility: 'visible',
-                        duration: 0.3,
-                        ease: "power2.out"
-                    });
-                } else {
-                    gsap.to(backToTopBtn, {
-                        opacity: 0,
-                        visibility: 'hidden',
-                        duration: 0.3,
-                        ease: "power2.out"
-                    });
-                }
-            }
-            
-            // Smooth scroll to top
-            backToTopBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                gsap.to(window, {
-                    scrollTo: 0,
-                    duration: 1,
-                    ease: "power2.inOut"
-                });
-            });
-            
-            // Add scroll listener
-            window.addEventListener('scroll', toggleBackToTop);
-            toggleBackToTop(); // Initial check
-        }
-        
-        // Copy to clipboard functionality
+
+        // Copy to clipboard
         const copyableItems = document.querySelectorAll('.contact-value[data-copy]');
         const notification = document.querySelector('.copy-notification');
-        
+
         copyableItems.forEach(item => {
-            item.addEventListener('click', function(e) {
+            item.addEventListener('click', function (e) {
                 e.preventDefault();
-                
-                const textToCopy = this.getAttribute('data-copy');
-                
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    // Show notification
-                    if (notification) {
-                        gsap.fromTo(notification,
-                            { opacity: 0, y: 100 },
-                            {
-                                opacity: 1,
-                                y: 0,
-                                duration: 0.3,
-                                onStart: () => notification.classList.add('show'),
-                                onComplete: () => {
-                                    setTimeout(() => {
-                                        gsap.to(notification, {
-                                            opacity: 0,
-                                            y: 100,
-                                            duration: 0.3,
-                                            onComplete: () => notification.classList.remove('show')
-                                        });
-                                    }, 2000);
-                                }
+                navigator.clipboard.writeText(this.getAttribute('data-copy')).then(() => {
+                    if (!notification) return;
+                    gsap.fromTo(notification,
+                        { opacity: 0, y: 100 },
+                        {
+                            opacity: 1, y: 0, duration: 0.3,
+                            onStart: () => notification.classList.add('show'),
+                            onComplete: () => {
+                                setTimeout(() => {
+                                    gsap.to(notification, {
+                                        opacity: 0, y: 100, duration: 0.3,
+                                        onComplete: () => notification.classList.remove('show')
+                                    });
+                                }, 2000);
                             }
-                        );
-                    }
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
+                        }
+                    );
                 });
             });
         });
-        
-        // Animate contact items on hover
-        const contactItems = document.querySelectorAll('.contact-item');
-        contactItems.forEach(item => {
-            item.addEventListener('mouseenter', function() {
-                gsap.to(this, {
-                    y: -5,
-                    boxShadow: '0 10px 20px rgba(220, 0, 0, 0.1)',
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
-            });
-            
-            item.addEventListener('mouseleave', function() {
-                gsap.to(this, {
-                    y: 0,
-                    boxShadow: 'none',
-                    duration: 0.3,
-                    ease: "power2.out"
-                });
-            });
-        });
-        
-        // Animate footer links
-        const footerLinks = document.querySelectorAll('.footerLink');
-        footerLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                
-                if (targetElement) {
-                    gsap.to(window, {
-                        scrollTo: { y: targetElement, offsetY: 80 },
-                        duration: 1,
-                        ease: "power2.inOut"
-                    });
-                }
-            });
+
+        // Hover on contact items
+        document.querySelectorAll('.contact-item').forEach(item => {
+            item.addEventListener('mouseenter', () => gsap.to(item, { y: -5, duration: 0.3 }));
+            item.addEventListener('mouseleave', () => gsap.to(item, { y: 0, duration: 0.3 }));
         });
     }
-    
-    // 8. SCROLL PROGRESS INDICATOR
+
+    // 8. SCROLL PROGRESS BAR
     function initScrollProgress() {
         const progressBar = document.createElement('div');
         progressBar.className = 'scroll-progress';
         document.body.appendChild(progressBar);
-        
+
         window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const winScroll = document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            
-            gsap.to(progressBar, {
-                width: `${scrolled}%`,
-                duration: 0.1,
-                ease: "none"
+            gsap.to(progressBar, { width: `${(winScroll / height) * 100}%`, duration: 0.1, ease: "none" });
+        });
+    }
+
+    // 9. NAV LINK SCROLL FIX
+    // ─── KEY FIX ─────────────────────────────────────────────────────────────
+    // After clicking a nav/footer anchor, ScrollTrigger doesn't fire for
+    // elements that are suddenly "in view" without a scroll event.
+    // Force-refresh after the browser finishes jumping.
+    // ─────────────────────────────────────────────────────────────────────────
+    function initNavScrollFix() {
+        document.querySelectorAll('#navbar a, .FL, footer a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function () {
+                // Wait for smooth-scroll to land, then wake up all triggers
+                setTimeout(() => {
+                    ScrollTrigger.refresh();      // recalculates all positions
+                    ScrollTrigger.getAll().forEach(st => st.update()); // re-evaluate each
+                }, 700);
             });
         });
     }
-    
-    // 9. INITIALIZE EVERYTHING
-    function initAllAnimations() {
-        // Start all animations
+
+    // 10. BOOT
+    function init() {
         initHeroAnimations();
         initNavAnimations();
         initSectionReveals();
@@ -463,67 +267,21 @@ document.addEventListener('DOMContentLoaded', function() {
         initProjectTabs();
         initFooterAnimations();
         initScrollProgress();
-        
-        console.log('🚀 Portfolio animations loaded successfully!');
+        initNavScrollFix();
+        console.log('Portfolio animations ready.');
     }
-    
-    // Wait a moment for page to load, then start animations
-    setTimeout(initAllAnimations, 100);
-    
-    // Reinitialize animations on window resize
+
+    setTimeout(init, 100);
+
+    // Refresh on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 250);
+        resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 250);
     });
-    
-    // Handle reduced motion preferences
+
+    // Respect reduced-motion preference
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        gsap.globalTimeline.timeScale(0.5);
-        console.log('Reduced motion enabled');
+        gsap.globalTimeline.timeScale(0.3);
     }
-        // ===========================================
-    // FIX: MANUALLY TRIGGER SCROLLTRIGGER AFTER NAV CLICKS
-    // ===========================================
-    
-    // Function to simulate a scroll event
-    function simulateScroll() {
-        // Dispatch a scroll event
-        window.dispatchEvent(new Event('scroll'));
-        
-        // Force ScrollTrigger to check positions
-        ScrollTrigger.getAll().forEach(trigger => {
-            trigger.update();
-        });
-        
-        // Refresh all ScrollTriggers
-        setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 100);
-    }
-    
-    // Override all existing click handlers
-    document.querySelectorAll('#navbar a, .footerLink').forEach(link => {
-        // Store original onclick
-        const originalClick = link.onclick;
-        
-        // Replace with new handler
-        link.addEventListener('click', function(e) {
-            // Let original handler run first
-            if (originalClick) originalClick.call(this, e);
-            
-            // After scrolling completes, simulate scroll events
-            setTimeout(() => {
-                // Simulate multiple scroll events over time
-                simulateScroll();
-                setTimeout(simulateScroll, 200);
-                setTimeout(simulateScroll, 400);
-            }, 600); // Wait for scroll animation to complete
-        });
-    });
-    
-    // Alternative: Add a scroll simulation button for testing
-    console.log('Scroll fix added. Test by clicking nav links.');
 });
