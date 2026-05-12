@@ -1892,4 +1892,3 @@ html:not(:hover)::-webkit-scrollbar-thumb {
 ::-webkit-scrollbar-thumb:active {
     animation: scrollbarPulse 1s infinite;
 }
-
